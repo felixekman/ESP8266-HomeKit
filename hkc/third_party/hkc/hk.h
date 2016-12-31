@@ -22,9 +22,9 @@ limitations under the License. */
 
 //#define DEMO
 #define FACTORY
-#define DEBUG0
-#define DEBUG1
-#define DEBUG2
+// #define DEBUG0
+// #define DEBUG1
+// #define DEBUG2
 #define DEBUG3
 #define DEBUG4
 //#define DEBUG5

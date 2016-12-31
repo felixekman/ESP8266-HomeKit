@@ -64,7 +64,9 @@ xQueueHandle identifyQueue;
 struct gpio {
 	int	aid;
 	int iid;
-} gpio2;
+} gpio2, gpio4;
+
+
 
 void led_task(void *arg) //make transfer of gpio via arg, starting as a static variable in led routine
 {
@@ -74,7 +76,7 @@ void led_task(void *arg) //make transfer of gpio via arg, starting as a static v
 	os_printf("led_task started\n");
 	value=cJSON_CreateBool(0); //value doesn't matter
 	while(1) {
-		vTaskDelay(1500); //15 sec
+		vTaskDelay(12000); //120 sec
 		original=GPIO_INPUT_GET(GPIO_ID_PIN(2)); //get original state
 //		os_printf("original:%d\n",original);
 		value->type=original^1;
@@ -96,7 +98,31 @@ void led(int aid, int iid, cJSON *value, int mode)
 			PIN_PULLUP_EN(GPIO_PIN_REG_2);
 			led(aid,iid,value,1);
 			gpio2.aid=aid; gpio2.iid=iid;
-			xTaskCreate(led_task,"led",512,NULL,2,NULL);
+			// xTaskCreate(led_task,"led",512,NULL,2,NULL);
+		}break;
+		case 2: { //update
+			//do nothing
+		}break;
+		default: {
+			//print an error?
+		}break;
+	}
+}
+
+
+void led2(int aid, int iid, cJSON *value, int mode)
+{
+ 	switch (mode) {
+ 		case 1: { //changed by gui
+			char *out; out=cJSON_Print(value);	os_printf("led2 %s\n",out);	free(out);	// Print to text, print it, release the string.
+			if (value) GPIO_OUTPUT_SET(GPIO_ID_PIN(4), value->type);
+		}break;
+ 		case 0: { //init
+			PIN_FUNC_SELECT(GPIO_PIN_REG_4,FUNC_GPIO4);
+			PIN_PULLUP_EN(GPIO_PIN_REG_4);
+			led2(aid,iid,value,1);
+			gpio4.aid=aid; gpio4.iid=iid;
+			// xTaskCreate(led_task,"led",512,NULL,2,NULL);
 		}break;
 		case 2: { //update
 			//do nothing
@@ -165,12 +191,12 @@ void	hkc_user_init(char *accname)
 	addCharacteristic(chas,aid,++iid,APPLE,IDENTIFY_C,NULL,identify);
 	//service 1
 	chas=addService(      sers,++iid,APPLE,SWITCH_S);
-	addCharacteristic(chas,aid,++iid,APPLE,NAME_C,"led",NULL);
+	addCharacteristic(chas,aid,++iid,APPLE,NAME_C,"Green LED",NULL);
 	addCharacteristic(chas,aid,++iid,APPLE,POWER_STATE_C,"1",led);
 	//service 2
 	chas=addService(      sers,++iid,APPLE,LIGHTBULB_S);
-	addCharacteristic(chas,aid,++iid,APPLE,NAME_C,"light",NULL);
-	addCharacteristic(chas,aid,++iid,APPLE,POWER_STATE_C,"0",NULL);
+	addCharacteristic(chas,aid,++iid,APPLE,NAME_C,"Yellow LED",NULL);
+	addCharacteristic(chas,aid,++iid,APPLE,POWER_STATE_C,"0",led2);
 	addCharacteristic(chas,aid,++iid,APPLE, BRIGHTNESS_C,"0",NULL);
 
 	char *out;
