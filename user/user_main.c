@@ -86,7 +86,7 @@ void led_task(void *arg) //make transfer of gpio via arg, starting as a static v
 	}
 }
 
-void led(int aid, int iid, cJSON *value, int mode)
+void green_led(int aid, int iid, cJSON *value, int mode)
 {
  	switch (mode) {
  		case 1: { //changed by gui
@@ -96,7 +96,7 @@ void led(int aid, int iid, cJSON *value, int mode)
  		case 0: { //init
 			PIN_FUNC_SELECT(GPIO_PIN_REG_2,FUNC_GPIO2);
 			PIN_PULLUP_EN(GPIO_PIN_REG_2);
-			led(aid,iid,value,1);
+			green_led(aid,iid,value,1);
 			gpio2.aid=aid; gpio2.iid=iid;
 			// xTaskCreate(led_task,"led",512,NULL,2,NULL);
 		}break;
@@ -110,7 +110,7 @@ void led(int aid, int iid, cJSON *value, int mode)
 }
 
 
-void led2(int aid, int iid, cJSON *value, int mode)
+void yellow_led(int aid, int iid, cJSON *value, int mode)
 {
  	switch (mode) {
  		case 1: { //changed by gui
@@ -120,7 +120,7 @@ void led2(int aid, int iid, cJSON *value, int mode)
  		case 0: { //init
 			PIN_FUNC_SELECT(GPIO_PIN_REG_4,FUNC_GPIO4);
 			PIN_PULLUP_EN(GPIO_PIN_REG_4);
-			led2(aid,iid,value,1);
+			yellow_led(aid,iid,value,1);
 			gpio4.aid=aid; gpio4.iid=iid;
 			// xTaskCreate(led_task,"led",512,NULL,2,NULL);
 		}break;
@@ -192,11 +192,11 @@ void	hkc_user_init(char *accname)
 	//service 1
 	chas=addService(      sers,++iid,APPLE,SWITCH_S);
 	addCharacteristic(chas,aid,++iid,APPLE,NAME_C,"Green LED",NULL);
-	addCharacteristic(chas,aid,++iid,APPLE,POWER_STATE_C,"1",led);
+	addCharacteristic(chas,aid,++iid,APPLE,POWER_STATE_C,"1",green_led);
 	//service 2
 	chas=addService(      sers,++iid,APPLE,LIGHTBULB_S);
 	addCharacteristic(chas,aid,++iid,APPLE,NAME_C,"Yellow LED",NULL);
-	addCharacteristic(chas,aid,++iid,APPLE,POWER_STATE_C,"0",led2);
+	addCharacteristic(chas,aid,++iid,APPLE,POWER_STATE_C,"0",yellow_led);
 	addCharacteristic(chas,aid,++iid,APPLE, BRIGHTNESS_C,"0",NULL);
 
 	char *out;
